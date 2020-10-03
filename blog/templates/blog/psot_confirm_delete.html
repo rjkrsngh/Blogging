@@ -1,0 +1,10 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+	<form method="POST">
+		{% csrf_token %}
+		<!-- This object is by default passed by Django's Deleteview -->
+		<p>Are you sure to delete this post: {{ object }}?</p>
+		<input type="submit" class="btn btn-danger" value="confirm">
+	</form>
+{% endblock %}

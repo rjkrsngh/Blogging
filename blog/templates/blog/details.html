@@ -1,0 +1,68 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+	<h1 class="posttitle loader"> {{post.title}} </h1>
+	{% if post.published_date %}
+		<div class="date postdate">
+			{{ post.published_date }}
+		</div>
+	{% else %}
+		<!-- Check if this code give a user to publish someone else's post -->
+		<a class="btn btn-default" href="{% url 'publish_post' pk = post.pk%}"> Publish </a>
+	{% endif %}
+
+	<p class="postcontent"> {{post.title|safe|linebreaksbr}} </p>
+
+	{% if user.is_authenticated %}
+		<!-- Provide the user right to edit a post -->
+		<a class="btn btn-primary" href="{% url 'post_edit' pk = post.pk %}">
+			<span class="glyphicon glyphicon-pencil"></span>
+		</a>
+
+		<!-- Provide the user right to delete a post -->
+		<a class="btn btn-primary" href="{% url 'post_delete' pk = post.pk %}">
+			<span class="glyphicon glyphicon-remove"></span>
+		</a>
+
+	{% endif %}
+
+	<hr>
+	<a class="btn btn-primary btn-comment" href="{% url 'comment' pk=post.pk %}"> Comment </a>
+
+	<!-- Display all the comments related to this Post -->
+	<div class = "container">
+		{% for comment in post.comments.all %}
+			<br>
+
+			{% if user.is_authenticated or comment.approved_comment %}
+				<!-- TODO: comeback to this line. It will show the comment date to other users even if the comment is not approved,
+				Meaning, it must not show the existance trace for a comment if it is not approved --> 
+				{{ comment.create_date }}
+				{% if not comment.approved_comment %}
+					<!-- Delete the comment if it is not approved -->
+					<a class="btn btn-default" href="{% url 'delete_comment' pk=comment.pk %}">
+						<span class="glyphicon glyphicon-remove"></span>
+					</a>
+
+					<!-- Approve the comment if not approved -->
+					<a class="btn btn-primary" href="{% url 'approve_comment' pk = comment.pk %}">
+						<span class="glyphicon glyphicon-ok"></span>
+					</a>
+				{% endif %}
+
+				<!-- Handle for the approved comments -->
+				<p> {{ comment.text|safe|linebreaks }} </p>
+				<p> Commented by: {{ comment.author }} </p>
+
+			{% endfor %}
+
+			<!-- In case of no comments -->
+			{% empty %}
+				<p> No comments! </p>
+
+		{% endfor %}
+	</div>
+
+
+
+{% endblock %}
